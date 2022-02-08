@@ -7,12 +7,14 @@ public class Board implements IBoard {
 
 	private static final int DEFAULT_SIZE = 10;
 	private String mName;
+	private int size;
 	private Character mShips[][];
 	private boolean mHits[][];
 	
 	
 	public Board(String name, int gridSize) {
 		mName=name;
+		size=gridSize;
 		mShips=new Character[gridSize][gridSize];
 		mHits=new boolean[gridSize][gridSize];
 	}
@@ -60,7 +62,7 @@ public class Board implements IBoard {
 	}
 	
 	public int getSize() {
-		return mShips.length;
+		return size;
 	}
 
 	public String getName() {
@@ -123,5 +125,69 @@ public class Board implements IBoard {
 		}
 
 		return true;
+	}
+
+	@Override
+	public boolean putShip(AbstractShip ship, Coords coords) {
+		if(canPutShip(ship, coords))
+		{
+			int dx=0;
+			int dy=0;
+			switch(ship.getOrientation())
+			{
+				case EAST:dx=1;break;
+				case SOUTH:dy=1;break;
+				case WEST:dx=-1;break;
+				case NORTH:dy=-1;break;
+				default: return false;
+			}
+			for(int cpt=0; cpt<ship.getLength(); cpt++)
+			{
+				mShips[coords.getX() + dx*cpt][coords.getY() + dy*cpt ]=ship.getLabel();
+			}
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean hasShip(Coords coords) {
+		return(mShips[coords.getX()][coords.getY()] != '.');
+	}
+
+	@Override
+	public void setHit(boolean hit, Coords coords) {
+		if(!mHits[coords.getX()][coords.getY()])
+		{
+			hit=true;
+			mHits[coords.getX()][coords.getY()]=true;
+		}
+		else
+		{
+			hit=false;
+		}
+		
+	}
+
+	@Override
+	public Boolean getHit(Coords coords) {
+		return(mHits[coords.getX()][coords.getY()]);
+	}
+
+	@Override
+	public Hit sendHit(Coords res) {
+		if(!getHit(res))
+		{
+			switch(mShips[res.getX()][res.getY()])
+			{
+				case '.':return Hit.MISS;
+				default: return Hit.STRIKE;
+			}
+		}
+		else
+		{
+			System.out.println("Already shot there!\n");
+			return Hit.MISS;
+		}
 	}
 }
