@@ -27,4 +27,9 @@ public class Coords {
 		x=coords.getX();
 		y=coords.getY();
 	}
+	public void setCoords(Coords res) {
+		x=res.getX();
+		y=res.getY();
+		
+	}
 }

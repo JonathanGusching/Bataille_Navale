@@ -19,10 +19,29 @@ public abstract class AbstractShip {
 	public void setOrientation(Orientation orientation) {
 		this.orientation = orientation;
 	}
+	public void setOrientation(String orientation) {
+		if(orientation=="NORTH" || orientation=="N")
+		{
+			this.orientation = Orientation.NORTH;
+		}
+		else if(orientation=="SOUTH" || orientation=="S")
+		{
+			this.orientation = Orientation.SOUTH;
+		}
+		else if(orientation=="EAST"|| orientation=="E")
+		{
+			this.orientation = Orientation.EAST;
+		}
+		else if(orientation=="WEST"|| orientation=="W")
+		{
+			this.orientation = Orientation.WEST;
+		}
+		
+	}
 	public Character getLabel() {
 		return label;
 	}
-	public String getShipName() {
+	public String getName() {
 		return shipName;
 	}
 	public int getLength() {

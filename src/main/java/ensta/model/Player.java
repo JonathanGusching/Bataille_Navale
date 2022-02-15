@@ -44,11 +44,22 @@ public class Player {
 			System.out.println(msg);
 			InputHelper.ShipInput res = InputHelper.readShipInput();
 			// TODO set ship orientation
-			// TODO put ship at given position
-			// TODO when ship placement successful
-			++i;
-			done = i == 5;
-
+			try
+			{	
+				ship.setOrientation(res.orientation.toUpperCase());
+				Coords coords=new Coords(res.x, res.y);
+				board.putShip(ship, coords);
+				// TODO put ship at given position
+				// TODO when ship placement successful
+				++i;
+				done = i == 5;
+			}
+			catch(Exception e)
+			{
+				System.out.println("Could not put ships, error:\n" + e.getMessage());
+				done=true;
+			}
+			
 			board.print();
 		} while (!done);
 	}
