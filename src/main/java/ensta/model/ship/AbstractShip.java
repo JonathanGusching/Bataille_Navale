@@ -58,7 +58,7 @@ public abstract class AbstractShip {
 	}
 	public boolean isSunk()
 	{
-		return length==strikeCount;
+		return (length==strikeCount);
 	}
 	
 }

@@ -23,7 +23,7 @@ public interface IBoard {
      * @param coords
      * @return true if a ship is located at the given position
      */
-    public boolean hasShip(Coords coords);
+    public Boolean hasShip(Coords coords);
 
     /**
      * Set the state of the hit at a given position

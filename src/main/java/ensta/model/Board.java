@@ -161,9 +161,21 @@ public class Board implements IBoard {
 		return false;
 	}
 
+	// We return a boolean. false=no ship, true = ship not sunk, null = otherwise, ship but sunk
 	@Override
-	public boolean hasShip(Coords coords) {
-		return(ships[coords.getX()][coords.getY()].getShip().getLabel() != '.');
+	public Boolean hasShip(Coords coords) {
+		if(ships[coords.getX()][coords.getY()].getShip()!=null && ships[coords.getX()][coords.getY()].isSunk())
+		{
+			return null;
+		}
+		else if(ships[coords.getX()][coords.getY()].getShip()==null)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
 	}
 
 	@Override
@@ -198,6 +210,7 @@ public class Board implements IBoard {
 				ships[res.getX()][res.getY()].addStrike();
 				if(ships[res.getX()][res.getY()].isSunk())
 				{
+					System.out.println(ships[res.getX()][res.getY()].getShip().getLabel() + " coulé!\n");
 					return Hit.fromInt(ships[res.getX()][res.getY()].getShip().getLength());
 				}
 				else
@@ -208,8 +221,8 @@ public class Board implements IBoard {
 		}
 		else
 		{
-			System.out.println("Already shot there!\n");
-			return Hit.MISS;
+			System.out.println("Already shot there!\n"); // On prévient quand même le joueur
+			return Hit.MISS; // on retourne MISS, en considérant qu'il s'agirait, comme dans le vrai jeu, d'un joueur qui se trompe, tant pis
 		}
 
 		
