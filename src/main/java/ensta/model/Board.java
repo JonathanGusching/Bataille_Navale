@@ -1,33 +1,35 @@
 package ensta.model;
 
 import ensta.model.ship.AbstractShip;
+import ensta.model.ship.ShipState;
+import ensta.util.ColorUtil;
 import ensta.util.Orientation;
 
 public class Board implements IBoard {
 
 	private static final int DEFAULT_SIZE = 10;
-	private String mName;
+	private String name;
 	private int size;
-	private Character mShips[][];
-	private boolean mHits[][];
+	private ShipState ships[][];
+	private Boolean hits[][];
 	
 	
 	public Board(String name, int gridSize) {
-		mName=name;
+		this.name=name;
 		size=gridSize;
-		mShips=new Character[gridSize][gridSize];
-		mHits=new boolean[gridSize][gridSize];
+		ships=new ShipState[gridSize][gridSize];
+		hits=new Boolean[gridSize][gridSize];
 	}
 	
 	public Board(String name) {
-		mName=name;
-		mShips=new Character[DEFAULT_SIZE][DEFAULT_SIZE];
-		mHits=new boolean[DEFAULT_SIZE][DEFAULT_SIZE];
+		this.name=name;
+		ships=new ShipState[DEFAULT_SIZE][DEFAULT_SIZE];
+		hits=new Boolean[DEFAULT_SIZE][DEFAULT_SIZE];
 	}
 	
 	public void print() {
-		int length = mShips.length;
-		int height = mShips[0].length;
+		int length = ships.length;
+		int height = ships[0].length;
 		
 		/* SHIP GRID */
 		System.out.println("Navires :\n  ");
@@ -41,9 +43,12 @@ public class Board implements IBoard {
 			System.out.println(i + "  ");
 			for(int j = 0; j< length; j++)
 			{
-				System.out.println(". ");
+				System.out.println(ships[i][j].getShip().getLabel() + " ");
 			}
+			System.out.println("\n");
 		}
+		
+		System.out.println("\n");
 		/* HIT GRID */
 		System.out.println("Frappes :\n  ");
 		for(char c='A' ; c < 'A'+length; c++)
@@ -56,8 +61,14 @@ public class Board implements IBoard {
 			System.out.println(i + "  ");
 			for(int j = 0; j< length; j++)
 			{
-				System.out.println(". ");
+				if(hits[i][j] == null)
+					System.out.println(". ");
+				else if(hits[i][j] == false)
+					System.out.println(ColorUtil.colorize("X", ColorUtil.Color.WHITE));
+				else
+					System.out.println(ColorUtil.colorize("X", ColorUtil.Color.RED));
 			}
+			System.out.println("\n");
 		}
 	}
 	
@@ -66,27 +77,27 @@ public class Board implements IBoard {
 	}
 
 	public String getName() {
-		return mName;
+		return name;
 	}
 
 	public void setName(String name) {
-		this.mName = name;
+		this.name = name;
 	}
 
-	public Character[][] getShips() {
-		return mShips;
+	public ShipState[][] getShips() {
+		return ships;
 	}
 
-	public void setShips(Character[][] ships) {
-		this.mShips = ships;
+	public void setShips(ShipState[][] ships) {
+		this.ships = ships;
 	}
 
-	public boolean[][] getHits() {
-		return mHits;
+	public Boolean[][] getHits() {
+		return hits;
 	}
 
-	public void setHits(boolean[][] hits) {
-		this.mHits = hits;
+	public void setHits(Boolean[][] hits) {
+		this.hits = hits;
 	}
 
 	public boolean canPutShip(AbstractShip ship, Coords coords) {
@@ -143,7 +154,7 @@ public class Board implements IBoard {
 			}
 			for(int cpt=0; cpt<ship.getLength(); cpt++)
 			{
-				mShips[coords.getX() + dx*cpt][coords.getY() + dy*cpt ]=ship.getLabel();
+				ships[coords.getX() + dx*cpt][coords.getY() + dy*cpt ]=new ShipState(ship);
 			}
 			return true;
 		}
@@ -152,15 +163,15 @@ public class Board implements IBoard {
 
 	@Override
 	public boolean hasShip(Coords coords) {
-		return(mShips[coords.getX()][coords.getY()] != '.');
+		return(ships[coords.getX()][coords.getY()].getShip().getLabel() != '.');
 	}
 
 	@Override
 	public void setHit(boolean hit, Coords coords) {
-		if(!mHits[coords.getX()][coords.getY()])
+		if(!hits[coords.getX()][coords.getY()])
 		{
 			hit=true;
-			mHits[coords.getX()][coords.getY()]=true;
+			hits[coords.getX()][coords.getY()]=true;
 		}
 		else
 		{
@@ -171,17 +182,28 @@ public class Board implements IBoard {
 
 	@Override
 	public Boolean getHit(Coords coords) {
-		return(mHits[coords.getX()][coords.getY()]);
+		return(hits[coords.getX()][coords.getY()]);
 	}
 
 	@Override
 	public Hit sendHit(Coords res) {
-		if(!getHit(res))
+		if(getHit(res)==null)
 		{
-			switch(mShips[res.getX()][res.getY()])
+			if(ships[res.getX()][res.getY()].getShip()==null)
 			{
-				case '.':return Hit.MISS;
-				default: return Hit.STRIKE;
+				return Hit.MISS;
+			}
+			else
+			{
+				ships[res.getX()][res.getY()].addStrike();
+				if(ships[res.getX()][res.getY()].isSunk())
+				{
+					return Hit.fromInt(ships[res.getX()][res.getY()].getShip().getLength());
+				}
+				else
+				{
+					return Hit.STRIKE;
+				}
 			}
 		}
 		else
@@ -189,5 +211,7 @@ public class Board implements IBoard {
 			System.out.println("Already shot there!\n");
 			return Hit.MISS;
 		}
+
+		
 	}
 }

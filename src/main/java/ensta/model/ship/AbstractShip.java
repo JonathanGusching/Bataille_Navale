@@ -6,6 +6,7 @@ public abstract class AbstractShip {
 	private String shipName;
 	private int length;
 	private Orientation orientation;
+	private int strikeCount;
 	public AbstractShip(String name, Character label, int size, Orientation orientation)
 	{
 		shipName=name;
@@ -46,6 +47,18 @@ public abstract class AbstractShip {
 	}
 	public int getLength() {
 		return length;
+	}
+	public int getStrikeCount()
+	{
+		return strikeCount;
+	}
+	public void addStrike()
+	{
+		strikeCount++;
+	}
+	public boolean isSunk()
+	{
+		return length==strikeCount;
 	}
 	
 }
