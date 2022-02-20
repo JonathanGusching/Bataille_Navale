@@ -11,7 +11,7 @@ import ensta.model.Coords;
 import ensta.model.Hit;
 import ensta.model.Player;
 import ensta.model.ship.AbstractShip;
-import ensta.model.ship.BattleShip;
+import ensta.model.ship.Battleship;
 import ensta.model.ship.Carrier;
 import ensta.model.ship.Destroyer;
 import ensta.model.ship.Submarine;
@@ -161,7 +161,7 @@ public class Game {
 	}
 
 	private static List<AbstractShip> createDefaultShips() {
-		return Arrays.asList(new AbstractShip[] { new Destroyer(), new Submarine(), new Submarine(), new BattleShip(),
+		return Arrays.asList(new AbstractShip[] { new Destroyer(), new Submarine(), new Submarine(), new Battleship(),
 				new Carrier() });
 	}
 }

@@ -19,6 +19,7 @@ public class ShipState {
 	{
 		if(!struck)
 		{
+			ship.addStrike();
 			struck=true;
 		}
 		else
@@ -47,5 +48,8 @@ public class ShipState {
 	public boolean isSunk()
 	{
 		return ship.isSunk();
+	}
+	public int getStrike() {
+		return ship.getStrike();
 	}
 }

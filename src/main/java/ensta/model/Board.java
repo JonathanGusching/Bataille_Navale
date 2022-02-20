@@ -23,6 +23,7 @@ public class Board implements IBoard {
 	
 	public Board(String name) {
 		this.name=name;
+		size=DEFAULT_SIZE;
 		ships=new ShipState[DEFAULT_SIZE][DEFAULT_SIZE];
 		hits=new Boolean[DEFAULT_SIZE][DEFAULT_SIZE];
 	}
@@ -31,45 +32,56 @@ public class Board implements IBoard {
 		int length = ships.length;
 		int height = ships[0].length;
 		
+		String str="   ";
 		/* SHIP GRID */
 		System.out.println("Navires :\n  ");
 		for(char c='A' ; c < 'A'+length; c++)
 		{
-			System.out.println(c + " ");
+			str+=c + " ";
 		}
-		System.out.println("");
+		System.out.println(str);
+		
+		str="";
 		for(int i = 0; i < height; i++)
 		{
-			System.out.println(i + "  ");
+			str+=i + "  ";
 			for(int j = 0; j< length; j++)
 			{
-				System.out.println(ships[i][j].getShip().getLabel() + " ");
+				if(ships[i][j]!=null)
+					str+=(ships[i][j].getShip().getLabel() + " ");
+				else
+				{
+					str+=(". ");
+
+				}
 			}
-			System.out.println("\n");
+			str+=("\n");
 		}
 		
-		System.out.println("\n");
+		System.out.println(str);
 		/* HIT GRID */
+		str="   ";
 		System.out.println("Frappes :\n  ");
 		for(char c='A' ; c < 'A'+length; c++)
 		{
-			System.out.println(c + " ");
+			str+=(c + " ");
 		}
-		System.out.println("");
+		str+=("\n");
 		for(int i = 0; i < height; i++)
 		{
-			System.out.println(i + "  ");
+			str+=(i + "  ");
 			for(int j = 0; j< length; j++)
 			{
 				if(hits[i][j] == null)
-					System.out.println(". ");
+					str+=(". ");
 				else if(hits[i][j] == false)
-					System.out.println(ColorUtil.colorize("X", ColorUtil.Color.WHITE));
+					str+=(ColorUtil.colorize("X ", ColorUtil.Color.WHITE));
 				else
-					System.out.println(ColorUtil.colorize("X", ColorUtil.Color.RED));
+					str+=(ColorUtil.colorize("X ", ColorUtil.Color.RED));
 			}
-			System.out.println("\n");
+			str+=("\n");
 		}
+		System.out.println(str);
 	}
 	
 	public int getSize() {
@@ -164,13 +176,13 @@ public class Board implements IBoard {
 	// We return a boolean. false=no ship, true = ship not sunk, null = otherwise, ship but sunk
 	@Override
 	public Boolean hasShip(Coords coords) {
-		if(ships[coords.getX()][coords.getY()].getShip()!=null && ships[coords.getX()][coords.getY()].isSunk())
-		{
-			return null;
-		}
-		else if(ships[coords.getX()][coords.getY()].getShip()==null)
+		if(ships[coords.getX()][coords.getY()]==null)
 		{
 			return false;
+		}
+		else if(ships[coords.getX()][coords.getY()].isSunk())
+		{
+			return null;
 		}
 		else
 		{
@@ -180,8 +192,14 @@ public class Board implements IBoard {
 
 	@Override
 	public void setHit(boolean hit, Coords coords) {
-		if(!hits[coords.getX()][coords.getY()])
+		/*
+		if(hits[coords.getX()][coords.getY()] == null)
 		{
+			hits[coords.getX()][coords.getY()]=hit;
+		}
+		else if(!hits[coords.getX()][coords.getY()])
+		{
+			
 			hit=true;
 			hits[coords.getX()][coords.getY()]=true;
 		}
@@ -189,7 +207,8 @@ public class Board implements IBoard {
 		{
 			hit=false;
 		}
-		
+		*/
+		hits[coords.getX()][coords.getY()]=hit;
 	}
 
 	@Override
@@ -201,8 +220,9 @@ public class Board implements IBoard {
 	public Hit sendHit(Coords res) {
 		if(getHit(res)==null)
 		{
-			if(ships[res.getX()][res.getY()].getShip()==null)
+			if(ships[res.getX()][res.getY()]==null)
 			{
+				System.out.println("Missed!");
 				return Hit.MISS;
 			}
 			else
@@ -210,11 +230,12 @@ public class Board implements IBoard {
 				ships[res.getX()][res.getY()].addStrike();
 				if(ships[res.getX()][res.getY()].isSunk())
 				{
-					System.out.println(ships[res.getX()][res.getY()].getShip().getLabel() + " coulé!\n");
+					System.out.println(ships[res.getX()][res.getY()].getShip() + " coulé!\n");
 					return Hit.fromInt(ships[res.getX()][res.getY()].getShip().getLength());
 				}
 				else
 				{
+					System.out.println("Strike!");
 					return Hit.STRIKE;
 				}
 			}

@@ -34,7 +34,11 @@ public enum Hit {
         }
         throw new NoSuchElementException("no enum for value " + value);
     }
-
+    
+    public String getLabel()
+    {
+    	return label;
+    }
     public String toString() {
         return this.label;
     }

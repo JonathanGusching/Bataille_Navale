@@ -13,6 +13,7 @@ public abstract class AbstractShip {
 		this.label=label;
 		this.length=size;
 		this.orientation=orientation;
+		strikeCount=0;
 	}
 	public Orientation getOrientation() {
 		return orientation;
@@ -59,6 +60,14 @@ public abstract class AbstractShip {
 	public boolean isSunk()
 	{
 		return (length==strikeCount);
+	}
+	public int getStrike()
+	{
+		return strikeCount;
+	}
+	public String toString()
+	{
+		return shipName;
 	}
 	
 }
