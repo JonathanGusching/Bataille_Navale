@@ -1,8 +1,10 @@
 package ensta.model.ship;
 
+import java.io.Serializable;
+
 import ensta.util.ColorUtil;
 
-public class ShipState {
+public class ShipState implements Serializable {
 	private AbstractShip ship;
 	private boolean struck;
 	public ShipState()

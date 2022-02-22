@@ -31,7 +31,6 @@ public class PlayerAI extends Player {
     @Override
 	public Hit sendHit(Coords coords) {
 		Hit hit = ai.sendHit(coords);
-		System.out.println("AI");
 		return hit;
 	}
 }

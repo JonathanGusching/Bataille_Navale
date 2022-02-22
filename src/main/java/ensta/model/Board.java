@@ -6,7 +6,6 @@ import ensta.util.ColorUtil;
 import ensta.util.Orientation;
 
 public class Board implements IBoard {
-
 	private static final int DEFAULT_SIZE = 10;
 	private String name;
 	private int size;
@@ -210,22 +209,6 @@ public class Board implements IBoard {
 
 	@Override
 	public void setHit(boolean hit, Coords coords) {
-		/*
-		if(hits[coords.getX()][coords.getY()] == null)
-		{
-			hits[coords.getX()][coords.getY()]=hit;
-		}
-		else if(!hits[coords.getX()][coords.getY()])
-		{
-			
-			hit=true;
-			hits[coords.getX()][coords.getY()]=true;
-		}
-		else
-		{
-			hit=false;
-		}
-		*/
 		hits[coords.getX()][coords.getY()]=hit;
 	}
 
@@ -236,30 +219,26 @@ public class Board implements IBoard {
 
 	@Override
 	public Hit sendHit(Coords res) {
-		if(true)
+		if(ships[res.getX()][res.getY()]==null)
 		{
-			if(ships[res.getX()][res.getY()]==null)
+			return Hit.MISS;
+		}
+		else if(!ships[res.getX()][res.getY()].isStruck())
+		{
+			ships[res.getX()][res.getY()].addStrike();
+			if(ships[res.getX()][res.getY()].isSunk())
 			{
-				return Hit.MISS;
+				return Hit.fromInt(ships[res.getX()][res.getY()].getShip().getLength());
 			}
 			else
 			{
-				ships[res.getX()][res.getY()].addStrike();
-				if(ships[res.getX()][res.getY()].isSunk())
-				{
-					System.out.println(ships[res.getX()][res.getY()].getShip() + " coulé!\n");
-					return Hit.fromInt(ships[res.getX()][res.getY()].getShip().getLength());
-				}
-				else
-				{
-					return Hit.STRIKE;
-				}
+				return Hit.STRIKE;
 			}
 		}
 		else
 		{
-			System.out.println("Already shot there!\n"); // On prévient quand même le joueur
-			return Hit.MISS; // on retourne MISS, en considérant qu'il s'agirait, comme dans le vrai jeu, d'un joueur qui se trompe, tant pis
+			return Hit.ALREADY_SHOT; // on retourne MISS, en considérant qu'il s'agirait, comme dans le vrai jeu, d'un joueur qui se trompe, tant pis
+		
 		}
 
 		

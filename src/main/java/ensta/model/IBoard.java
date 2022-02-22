@@ -1,8 +1,10 @@
 package ensta.model;
 
+import java.io.Serializable;
+
 import ensta.model.ship.AbstractShip;
 
-public interface IBoard { 
+public interface IBoard extends Serializable{ 
 
     /**
      * Get the size of the grids contained in the Board

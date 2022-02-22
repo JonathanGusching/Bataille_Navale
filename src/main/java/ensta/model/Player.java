@@ -7,7 +7,7 @@ import ensta.model.ship.AbstractShip;
 import ensta.util.Orientation;
 import ensta.view.InputHelper;
 
-public class Player {
+public class Player implements Serializable{
 	/*
 	 * ** Attributs
 	 */
@@ -75,9 +75,6 @@ public class Player {
 		do {
 			System.out.println("où frapper?");
 			InputHelper.CoordInput hitInput = InputHelper.readCoordInput();
-			// TODO call sendHit on this.opponentBoard
-			// TODO : Game expects sendHit to return BOTH hit result & hit coords.
-			// return hit is obvious. But how to return coords at the same time ?
 			try
 			{
 				coords.setX(hitInput.x);

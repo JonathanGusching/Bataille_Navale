@@ -1,7 +1,12 @@
 package ensta.controller;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +37,7 @@ public class Game {
 	private Player player1;
 	private Player player2;
 	private Scanner sin;
+	private boolean singlePlayer;
 
 	/*
 	 * *** Constructeurs
@@ -39,21 +45,25 @@ public class Game {
 	public Game() {
 	}
 
-	public Game init() {
+	public Game init(boolean singlePlayer) {
 		if (!loadSave()) {
 			sin = new Scanner(System.in);
 			List<AbstractShip> ships = createDefaultShips();
 			List<AbstractShip> aiShips = createDefaultShips();
 			
-			// TODO init boards
 			Board playerBoard = new Board("Player Board");
 			Board aiBoard = new Board("AI Board");
 
-			// TODO init this.player1 & this.player2
 			player1 = new Player(playerBoard, aiBoard, ships);
-			player2 = new PlayerAI(aiBoard, playerBoard, aiShips);
+			// The boolean allows the player to choose single vs multiplayer
+			this.singlePlayer=singlePlayer;
+			if(singlePlayer)
+				player2 = new PlayerAI(aiBoard, playerBoard, aiShips);
+			else
+			{
+				player2 = new Player(aiBoard, playerBoard, aiShips);
 
-			// TODO place player ships
+			}
 			player1.putShips();
 			player2.putShips();
 		}
@@ -66,37 +76,46 @@ public class Game {
 	public void run() {
 		Coords coords = new Coords();
 		Board b1 = player1.getBoard();
+		Board b2 = player2.getBoard(); // multiplayer
 		Hit hit;
 
 		// main loop
 		b1.print();
 		boolean done;
+		boolean strike;
 		do {
-			//hit = Hit.MISS; // TODO player1 send a hit
 			hit=player1.sendHit(coords);
-			boolean strike = hit != Hit.MISS; // TODO set this hit on his board (b1)
-			b1.setHit(strike, coords);
+			strike = hit != Hit.MISS && hit!= Hit.ALREADY_SHOT; // TODO set this hit on his board (b1)
+			if(hit!=Hit.ALREADY_SHOT)
+				b1.setHit(strike, coords);
 			done = updateScore();
 			b1.print();
 			System.out.println(makeHitMessage(false /* outgoing hit */, coords, hit));
 
-			// save();
+			save();
 
 			if (!done && !strike) {
 				do {
-					//hit = Hit.MISS; // TODO player2 send a hit.
 					hit=player2.sendHit(coords);
 
-					strike = hit != Hit.MISS;
+					strike = hit != Hit.MISS && hit!= Hit.ALREADY_SHOT;
 					
-					if (strike) {
-						b1.print();
-					}
+					//On commente les lignes là pour pas que le joueur 2 puisse voir 1
+					//if (strike) {
+						//b1.print();
+					//}
+					
 					System.out.println(makeHitMessage(true /* incoming hit */, coords, hit));
 					done = updateScore();
+					if(!singlePlayer)
+					{
+						if(hit!=Hit.ALREADY_SHOT)
+							b2.setHit(strike, coords);
+						b2.print();
+					}
 
 					if (!done) {
-//						save();
+						save();
 					}
 				} while (strike && !done);
 			}
@@ -109,29 +128,45 @@ public class Game {
 	}
 
 	private void save() {
-//		try {
-//			// TODO bonus 2 : uncomment
-//			// if (!SAVE_FILE.exists()) {
-//			// SAVE_FILE.getAbsoluteFile().getParentFile().mkdirs();
-//			// }
-//
-//			// TODO bonus 2 : serialize players
-//
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+		try {
+			//TODO bonus 2 : uncomment
+			if (!SAVE_FILE.exists()) {
+				SAVE_FILE.getAbsoluteFile().getParentFile().mkdirs();
+			}
+
+			//TODO bonus 2 : serialize players
+			ObjectOutputStream oos =  new ObjectOutputStream(new FileOutputStream(SAVE_FILE)) ;
+			 // sérialization de l'objet
+			oos.writeObject(singlePlayer);
+			oos.writeObject(player1) ;
+			oos.writeObject(player2) ;
+			oos.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private boolean loadSave() {
-//		if (SAVE_FILE.exists()) {
-//			try {
+		if (SAVE_FILE.exists()) {
 //				// TODO bonus 2 : deserialize players
-//
-//				return true;
-//			} catch (IOException | ClassNotFoundException e) {
-//				e.printStackTrace();
-//			}
-//		}
+		// ouverture d'un flux sur un fichier
+					ObjectInputStream ois;
+					try {
+						ois = new ObjectInputStream(new FileInputStream(SAVE_FILE));
+						singlePlayer=(boolean)ois.readObject();
+						player1 = (Player)ois.readObject() ;
+						if(singlePlayer)
+							player2 = (PlayerAI)ois.readObject();
+						else
+							player2 = (Player)ois.readObject();
+						ois.close();
+						
+						return true;
+					} catch (ClassNotFoundException | IOException e1) {
+						e1.printStackTrace();
+					}
+		}
 		return false;
 	}
 
@@ -163,6 +198,9 @@ public class Game {
 		case STRIKE:
 			msg = hit.toString();
 			color = ColorUtil.Color.RED;
+			break;
+		case ALREADY_SHOT:
+			msg=hit.toString();
 			break;
 		default:
 			msg = hit.toString() + " coulé";
