@@ -22,21 +22,25 @@ public abstract class AbstractShip {
 		this.orientation = orientation;
 	}
 	public void setOrientation(String orientation) {
-		if(orientation=="NORTH" || orientation=="N")
+		if(orientation.equals("NORTH") || orientation.equals("N"))
 		{
 			this.orientation = Orientation.NORTH;
 		}
-		else if(orientation=="SOUTH" || orientation=="S")
+		else if(orientation.equals("SOUTH") || orientation.equals("S"))
 		{
 			this.orientation = Orientation.SOUTH;
 		}
-		else if(orientation=="EAST"|| orientation=="E")
+		else if(orientation.equals("EAST")|| orientation.equals("E"))
 		{
 			this.orientation = Orientation.EAST;
 		}
-		else if(orientation=="WEST"|| orientation=="W")
+		else if(orientation.equals("WEST")|| orientation.equals("W"))
 		{
 			this.orientation = Orientation.WEST;
+		}
+		else
+		{
+			System.out.println("ORIENTATION ISSUE");
 		}
 		
 	}

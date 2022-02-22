@@ -78,8 +78,17 @@ public class Player {
 			// TODO call sendHit on this.opponentBoard
 			// TODO : Game expects sendHit to return BOTH hit result & hit coords.
 			// return hit is obvious. But how to return coords at the same time ?
-			coords=new Coords(hitInput.x, hitInput.y); // returning the coords
-			opponentBoard.sendHit(coords); 
+			try
+			{
+				coords.setX(hitInput.x);
+				coords.setY(hitInput.y);
+				hit=opponentBoard.sendHit(coords);
+				done=true;
+			}
+			catch(Exception e)
+			{
+				System.out.println(e.getMessage());
+			}
 		} while (!done);
 		return hit;
 	}

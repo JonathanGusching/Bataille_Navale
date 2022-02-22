@@ -2,10 +2,12 @@ package ensta.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+import ensta.ai.PlayerAI;
 import ensta.model.Board;
 import ensta.model.Coords;
 import ensta.model.Hit;
@@ -39,13 +41,21 @@ public class Game {
 
 	public Game init() {
 		if (!loadSave()) {
-
-
+			sin = new Scanner(System.in);
+			List<AbstractShip> ships = createDefaultShips();
+			List<AbstractShip> aiShips = createDefaultShips();
+			
 			// TODO init boards
+			Board playerBoard = new Board("Player Board");
+			Board aiBoard = new Board("AI Board");
 
 			// TODO init this.player1 & this.player2
+			player1 = new Player(playerBoard, aiBoard, ships);
+			player2 = new PlayerAI(aiBoard, playerBoard, aiShips);
 
 			// TODO place player ships
+			player1.putShips();
+			player2.putShips();
 		}
 		return this;
 	}
@@ -62,9 +72,10 @@ public class Game {
 		b1.print();
 		boolean done;
 		do {
-			hit = Hit.MISS; // TODO player1 send a hit
+			//hit = Hit.MISS; // TODO player1 send a hit
+			hit=player1.sendHit(coords);
 			boolean strike = hit != Hit.MISS; // TODO set this hit on his board (b1)
-
+			b1.setHit(strike, coords);
 			done = updateScore();
 			b1.print();
 			System.out.println(makeHitMessage(false /* outgoing hit */, coords, hit));
@@ -73,9 +84,11 @@ public class Game {
 
 			if (!done && !strike) {
 				do {
-					hit = Hit.MISS; // TODO player2 send a hit.
+					//hit = Hit.MISS; // TODO player2 send a hit.
+					hit=player2.sendHit(coords);
 
 					strike = hit != Hit.MISS;
+					
 					if (strike) {
 						b1.print();
 					}

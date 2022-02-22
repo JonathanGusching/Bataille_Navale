@@ -42,13 +42,18 @@ public class Board implements IBoard {
 		System.out.println(str);
 		
 		str="";
-		for(int i = 0; i < height; i++)
+		for(int i = 1; i <= height; i++)
 		{
-			str+=i + "  ";
+			if(i<10)
+				str+=i + "  ";
+			else
+			{
+				str+=i + " ";
+			}
 			for(int j = 0; j< length; j++)
 			{
-				if(ships[i][j]!=null)
-					str+=(ships[i][j].getShip().getLabel() + " ");
+				if(ships[j][i-1]!=null)
+					str+=(ships[j][i-1].getShip().getLabel() + " ");
 				else
 				{
 					str+=(". ");
@@ -67,14 +72,20 @@ public class Board implements IBoard {
 			str+=(c + " ");
 		}
 		str+=("\n");
-		for(int i = 0; i < height; i++)
+		for(int i = 1; i <= height; i++)
 		{
-			str+=(i + "  ");
+			if(i<10)
+				str+=i + "  ";
+			else
+			{
+				str+=i + " "; // numbers between 10 and 99 use 2 characters, so we have to align the grid.
+							  // We suppose there won't be grids bigger than 100
+			}
 			for(int j = 0; j< length; j++)
 			{
-				if(hits[i][j] == null)
+				if(hits[j][i-1] == null)
 					str+=(". ");
-				else if(hits[i][j] == false)
+				else if(hits[j][i-1] == false)
 					str+=(ColorUtil.colorize("X ", ColorUtil.Color.WHITE));
 				else
 					str+=(ColorUtil.colorize("X ", ColorUtil.Color.RED));
@@ -116,12 +127,12 @@ public class Board implements IBoard {
 		Orientation o = ship.getOrientation();
 		int dx = 0, dy = 0;
 		if (o == Orientation.EAST) {
-			if (coords.getX() + ship.getLength() >= this.size) {
+			if (coords.getX() + ship.getLength()  > this.size) {
 				return false;
 			}
 			dx = 1;
 		} else if (o == Orientation.SOUTH) {
-			if (coords.getY() + ship.getLength() >= this.size) {
+			if (coords.getY() + ship.getLength() > this.size) {
 				return false;
 			}
 			dy = 1;
@@ -152,23 +163,30 @@ public class Board implements IBoard {
 
 	@Override
 	public boolean putShip(AbstractShip ship, Coords coords) {
-		if(canPutShip(ship, coords))
+		try
 		{
-			int dx=0;
-			int dy=0;
-			switch(ship.getOrientation())
+			if(canPutShip(ship, coords))
 			{
-				case EAST:dx=1;break;
-				case SOUTH:dy=1;break;
-				case WEST:dx=-1;break;
-				case NORTH:dy=-1;break;
-				default: return false;
+				int dx=0;
+				int dy=0;
+				switch(ship.getOrientation())
+				{
+					case EAST:dx=1;break;
+					case SOUTH:dy=1;break;
+					case WEST:dx=-1;break;
+					case NORTH:dy=-1;break;
+					default: return false;
+				}
+				for(int cpt=0; cpt<ship.getLength(); cpt++)
+				{
+					ships[coords.getX() + dx*cpt][coords.getY() + dy*cpt ]=new ShipState(ship);
+				}
+				return true;
 			}
-			for(int cpt=0; cpt<ship.getLength(); cpt++)
-			{
-				ships[coords.getX() + dx*cpt][coords.getY() + dy*cpt ]=new ShipState(ship);
-			}
-			return true;
+		}
+		catch(Exception e)
+		{
+			System.out.println("Couldn't put ship " + e.getMessage());
 		}
 		return false;
 	}
@@ -218,11 +236,10 @@ public class Board implements IBoard {
 
 	@Override
 	public Hit sendHit(Coords res) {
-		if(getHit(res)==null)
+		if(true)
 		{
 			if(ships[res.getX()][res.getY()]==null)
 			{
-				System.out.println("Missed!");
 				return Hit.MISS;
 			}
 			else
@@ -235,7 +252,6 @@ public class Board implements IBoard {
 				}
 				else
 				{
-					System.out.println("Strike!");
 					return Hit.STRIKE;
 				}
 			}
