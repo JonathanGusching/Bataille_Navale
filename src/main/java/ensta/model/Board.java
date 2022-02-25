@@ -6,6 +6,10 @@ import ensta.util.ColorUtil;
 import ensta.util.Orientation;
 
 public class Board implements IBoard {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final int DEFAULT_SIZE = 10;
 	private String name;
 	private int size;
@@ -221,7 +225,7 @@ public class Board implements IBoard {
 	public Hit sendHit(Coords res) {
 		if(ships[res.getX()][res.getY()]==null)
 		{
-			return Hit.MISS;
+			return Hit.MISS;	
 		}
 		else if(!ships[res.getX()][res.getY()].isStruck())
 		{

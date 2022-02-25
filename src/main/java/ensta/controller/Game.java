@@ -37,7 +37,7 @@ public class Game {
 	private Player player1;
 	private Player player2;
 	private Scanner sin;
-	private boolean singlePlayer;
+	private Boolean singlePlayer;
 
 	/*
 	 * *** Constructeurs
@@ -84,26 +84,37 @@ public class Game {
 		boolean done;
 		boolean strike;
 		do {
+			save(); // On sauvegarde avant que le joueur 1 joue son tour actuel pour éviter de skip le tour du joueur 2
+			
+			System.out.println("===Player 1===");
+			b1.print(); // On affiche la grille avant de jouer
 			hit=player1.sendHit(coords);
-			strike = hit != Hit.MISS && hit!= Hit.ALREADY_SHOT; // TODO set this hit on his board (b1)
+			strike = (hit != Hit.MISS) && (hit!= Hit.ALREADY_SHOT); // TODO set this hit on his board (b1)
+			
 			if(hit!=Hit.ALREADY_SHOT)
+			{
 				b1.setHit(strike, coords);
+			}
 			done = updateScore();
-			b1.print();
 			System.out.println(makeHitMessage(false /* outgoing hit */, coords, hit));
 
-			save();
 
 			if (!done && !strike) {
 				do {
+					if(!singlePlayer)
+					{
+						System.out.println("===Player 2===");
+						b2.print();
+					}
+					
 					hit=player2.sendHit(coords);
 
 					strike = hit != Hit.MISS && hit!= Hit.ALREADY_SHOT;
 					
-					//On commente les lignes là pour pas que le joueur 2 puisse voir 1
-					//if (strike) {
-						//b1.print();
-					//}
+					//il ne faut pas que le joueur 2 puisse voir 1
+					if (singlePlayer && strike) {
+						b1.print();
+					}
 					
 					System.out.println(makeHitMessage(true /* incoming hit */, coords, hit));
 					done = updateScore();
@@ -114,9 +125,9 @@ public class Game {
 						b2.print();
 					}
 
-					if (!done) {
-						save();
-					}
+					//if (!done) {
+						//save();
+					//}
 				} while (strike && !done);
 			}
 
@@ -124,17 +135,18 @@ public class Game {
 
 		SAVE_FILE.delete();
 		System.out.println(String.format("joueur %d gagne", player1.isLose() ? 2 : 1));
-		sin.close();
+		if(sin!=null)
+		{
+			sin.close();
+		}
 	}
 
 	private void save() {
 		try {
-			//TODO bonus 2 : uncomment
 			if (!SAVE_FILE.exists()) {
 				SAVE_FILE.getAbsoluteFile().getParentFile().mkdirs();
 			}
 
-			//TODO bonus 2 : serialize players
 			ObjectOutputStream oos =  new ObjectOutputStream(new FileOutputStream(SAVE_FILE)) ;
 			 // sérialization de l'objet
 			oos.writeObject(singlePlayer);
@@ -149,23 +161,22 @@ public class Game {
 
 	private boolean loadSave() {
 		if (SAVE_FILE.exists()) {
-//				// TODO bonus 2 : deserialize players
-		// ouverture d'un flux sur un fichier
-					ObjectInputStream ois;
-					try {
-						ois = new ObjectInputStream(new FileInputStream(SAVE_FILE));
-						singlePlayer=(boolean)ois.readObject();
-						player1 = (Player)ois.readObject() ;
-						if(singlePlayer)
-							player2 = (PlayerAI)ois.readObject();
-						else
-							player2 = (Player)ois.readObject();
-						ois.close();
-						
-						return true;
-					} catch (ClassNotFoundException | IOException e1) {
-						e1.printStackTrace();
-					}
+				ObjectInputStream ois;
+				try {
+					ois = new ObjectInputStream(new FileInputStream(SAVE_FILE));
+					singlePlayer=(Boolean)ois.readObject();
+					player1 = (Player)ois.readObject() ;
+					if(singlePlayer)
+						player2 = (PlayerAI)ois.readObject();
+					else
+						player2 = (Player)ois.readObject();
+					ois.close();
+					
+					return true;
+				} catch (ClassNotFoundException | IOException e1) {
+					e1.printStackTrace();
+					System.out.println("Could not open savefile, maybe it was empty?");
+				}
 		}
 		return false;
 	}

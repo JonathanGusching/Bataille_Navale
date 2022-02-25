@@ -8,6 +8,10 @@ import ensta.util.Orientation;
 import ensta.view.InputHelper;
 
 public class Player implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/*
 	 * ** Attributs
 	 */
@@ -21,9 +25,11 @@ public class Player implements Serializable{
 	 * ** Constructeur
 	 */
 	public Player(Board board, Board opponentBoard, List<AbstractShip> ships) {
-		this.setBoard(board);
+		this.board = board;
 		this.ships = ships.toArray(new AbstractShip[0]);
 		this.opponentBoard = opponentBoard;
+		destroyedCount=0;
+		lose=false;
 	}
 
 	/*
@@ -43,7 +49,6 @@ public class Player implements Serializable{
 			String msg = String.format("placer %d : %s(%d)", i + 1, ship.getName(), ship.getLength());
 			System.out.println(msg);
 			InputHelper.ShipInput res = InputHelper.readShipInput();
-			// TODO set ship orientation
 			try
 			{	
 				ship.setOrientation(res.orientation.toUpperCase());

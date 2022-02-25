@@ -9,7 +9,11 @@ import ensta.model.ship.AbstractShip;
 import ensta.view.InputHelper;
 
 public class PlayerAI extends Player {
-    /* **
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	/* **
      * Attribut
      */
     private BattleShipsAI ai;
@@ -22,7 +26,6 @@ public class PlayerAI extends Player {
         ai = new BattleShipsAI(ownBoard, opponentBoard);
     }
 
-    // TODO AIPlayer must not inherit "keyboard behavior" from player. Call ai instead.
     @Override
     public void putShips() {
 		ai.putShips(ships);
